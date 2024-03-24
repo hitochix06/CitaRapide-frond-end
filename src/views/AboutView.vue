@@ -160,7 +160,9 @@ const handleClick = (item) => {
 const fetchQuotes = async () => {
   isLoading.value = true; // Début du chargement
   try {
-    const response = await axios.get("http://localhost:3000/citations");
+    const response = await axios.get(
+      "https://cita-rapide-backend.vercel.app/citations"
+    );
     let data = response.data;
     // Si un thème est sélectionné, filtrer les citations en fonction du thème
     if (selectedTheme.value) {
@@ -198,7 +200,7 @@ const handleGenerate = () => {
 const handleDelete = async (_id) => {
   try {
     const response = await axios.delete(
-      `http://localhost:3000/citations/${_id}`
+      `https://cita-rapide-backend.vercel.app/citations/${_id}`
     );
     if (response.status === 200) {
       const index = quotes.value.findIndex((quote) => quote._id === _id);
