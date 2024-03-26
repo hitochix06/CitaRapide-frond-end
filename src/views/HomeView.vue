@@ -14,7 +14,14 @@
     <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4">
       <div class="flex flex-col space-y-4">
         <!-- rajouter  citation -->
-
+        <transition name="slide-fade">
+          <div
+            v-if="showToast"
+            class="fixed top-5 right-5 bg-gradient-to-r from-green-400 to-blue-500 text-white py-2 px-4 rounded"
+          >
+            {{ toastMessage }}
+          </div>
+        </transition>
         <input
           v-model="search"
           class="form-input block w-full text-gray-700 py-3 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
@@ -52,12 +59,25 @@
   font-family: "Arial", sans-serif;
   font-size: 1em;
 }
+
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition: all 0.5s ease;
+}
+.slide-fade-enter,
+.slide-fade-leave-to {
+  opacity: 0;
+  transform: translateX(50px);
+}
 </style>
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import axios from "axios";
 import { selectData } from "../components/SelectData"; // Importer selectData
+
+const toastMessage = ref("");
+const showToast = ref(false);
 
 // Définir la valeur de quotes
 const quotes = ref([]);
@@ -162,10 +182,18 @@ const generateQuoteFromAPI = async () => {
 
 // Modifier la méthode handleGenerate pour utiliser generateQuoteFromAPI
 const handleGenerate = () => {
-  console.log("Thème sélectionné:", selectedTheme.value); // Ajouter cette ligne
   generateQuoteFromAPI();
   search.value = ""; // Réinitialiser la valeur de search
   isGenerated.value = true; // Mettre à jour la valeur de isGenerated
+  displayToast("Citation bien rajoutée"); // Afficher un toast pour confirmer l'ajout
+};
+
+const displayToast = (message) => {
+  toastMessage.value = message;
+  showToast.value = true;
+  setTimeout(() => {
+    showToast.value = false;
+  }, 3000); // Le toast disparaît après 3 secondes
 };
 
 onMounted(fetchQuotes);
