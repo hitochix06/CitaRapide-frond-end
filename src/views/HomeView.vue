@@ -126,22 +126,21 @@ const generateQuoteFromAPI = async () => {
   }
   isLoading.value = true; // Début du chargement
   try {
+    // Modifier l'URL et la structure de la requête pour correspondre à la nouvelle API
     const response = await axios.get(
-      `https://api.api-ninjas.com/v1/quotes?category=${selectedTheme.value}`,
-      {
-        headers: {
-          "X-Api-Key": process.env.VITE_APP_API_KEY,
-        },
-      }
+      `https://cita-rapide-backend.vercel.app/v1/quotes/${selectedTheme.value}`
     );
     if (response.data && response.data.length > 0) {
-      const quote = response.data[0];
-      // Envoyer la citation à votre API backend pour stockage
-      const saveResponse = await axios.post("http://localhost:3000/citations", {
-        proverbe: quote.quote,
-        auteur: quote.author,
-        theme: selectedTheme.value,
-      });
+      const quote = response.data[0]; // Supposer que l'API renvoie un tableau de citations
+      // Envoyer la citation à votre API backend pour stockage, si nécessaire
+      const saveResponse = await axios.post(
+        "https://cita-rapide-backend.vercel.app/citations",
+        {
+          proverbe: quote.quote, // Assurez-vous que ces champs correspondent à ceux attendus par votre API backend
+          auteur: quote.author,
+          theme: selectedTheme.value,
+        }
+      );
       if (saveResponse.data && saveResponse.data.result) {
         // Citation enregistrée avec succès, ajouter à l'état local si nécessaire
         quotes.value.push(saveResponse.data.citation);
