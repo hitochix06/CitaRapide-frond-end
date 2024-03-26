@@ -35,10 +35,15 @@
         >
           {{ item.theme }}
         </div>
-
+        <!-- Message d'erreur pour le thème non sélectionné -->
+        <div v-if="errorMessage" class="text-red-500 text-center">
+          {{ errorMessage }}
+        </div>
+        <!-- Le bouton Générer apparaît seulement si un thème est sélectionné -->
         <button
+          v-if="selectedTheme"
           @click="handleGenerate"
-          class="py-3 px-4 bg-gradient-to-r from-green-400 to-blue-500 text-white font-bold rounded-md shadow hover:from-green-500 hover:to-blue-600 focus:ring-4 focus:ring-blue-300 focus:outline-none"
+          class="py-3 px-4 font-bold rounded-md shadow focus:outline-none bg-gradient-to-r from-green-400 to-blue-500 text-white hover:from-green-500 hover:to-blue-600 focus:ring-4 focus:ring-blue-300"
         >
           Générer
         </button>
@@ -49,17 +54,6 @@
 </template>
 
 <style scoped>
-.quote-proverb {
-  font-family: "Georgia", serif;
-  font-size: 1.2em;
-  font-style: italic;
-}
-
-.quote-author {
-  font-family: "Arial", sans-serif;
-  font-size: 1em;
-}
-
 .slide-fade-enter-active,
 .slide-fade-leave-active {
   transition: all 0.5s ease;
@@ -79,9 +73,6 @@ import { selectData } from "../components/SelectData"; // Importer selectData
 const toastMessage = ref("");
 const showToast = ref(false);
 
-// Définir la valeur de quotes
-const quotes = ref([]);
-
 // Définir la valeur de isGenerated
 const isGenerated = ref(false);
 
@@ -90,7 +81,7 @@ const isLoading = ref(false);
 
 // Définir la valeur de search
 const search = ref("");
-const selectedTheme = ref(""); // Nouvelle variable pour le thème sélectionné
+const selectedTheme = ref(null); // Initialisez selectedTheme avec null pour indiquer qu'aucun thème n'est sélectionné au départ
 const errorMessage = ref(""); // Nouvelle variable pour le message d'erreur
 
 // Filtrer les données en fonction de la valeur de search
@@ -102,40 +93,8 @@ const filteredData = computed(() => {
 });
 
 const handleClick = (item) => {
-  // Mettre à jour selectedTheme au lieu de search
-  search.value = item.theme;
-  selectedTheme.value = item.theme;
-};
-
-// rechercher les citations
-const fetchQuotes = async () => {
-  isLoading.value = true; // Début du chargement
-  try {
-    const response = await axios.get("http://localhost:3000/citations");
-    let data = response.data;
-    // Si un thème est sélectionné, filtrer les citations en fonction du thème
-    if (selectedTheme.value) {
-      data = data.filter((quote) => quote.theme === selectedTheme.value);
-    }
-    // Vérifier si des citations ont été trouvées pour le thème sélectionné
-    if (data.length === 0) {
-      errorMessage.value = "Aucune citation trouvée pour ce thème.";
-      return;
-    }
-    // Associer chaque citation à son thème correspondant dans selectData
-    setTimeout(() => {
-      quotes.value = data.map((quote) => {
-        const themeData = selectData.find((item) => item.theme === quote.theme);
-        return { ...quote, ...themeData };
-      });
-      errorMessage.value = ""; // Réinitialiser le message d'erreur
-      isLoading.value = false; // Fin du chargement
-    }, 2000); // Ajouter un délai de 5 secondes
-  } catch (error) {
-    console.error(error);
-    errorMessage.value = "Impossible de se connecter à la base de données.";
-    isLoading.value = false; // Fin d
-  }
+  selectedTheme.value = item.theme; // Mettez à jour selectedTheme avec le thème sélectionné
+  // Vous pouvez ajouter d'autres actions ici si nécessaire
 };
 
 const generateQuoteFromAPI = async () => {
@@ -144,7 +103,6 @@ const generateQuoteFromAPI = async () => {
       "Veuillez sélectionner un thème pour générer une citation.";
     return;
   }
-  isLoading.value = true; // Début du chargement
   try {
     // Modifier l'URL et la structure de la requête pour correspondre à la nouvelle API
     const response = await axios.get(
@@ -182,6 +140,11 @@ const generateQuoteFromAPI = async () => {
 
 // Modifier la méthode handleGenerate pour utiliser generateQuoteFromAPI
 const handleGenerate = () => {
+  if (!selectedTheme.value) {
+    errorMessage.value =
+      "Veuillez sélectionner un thème avant de générer une citation.";
+    return;
+  }
   generateQuoteFromAPI();
   search.value = ""; // Réinitialiser la valeur de search
   isGenerated.value = true; // Mettre à jour la valeur de isGenerated
@@ -195,6 +158,4 @@ const displayToast = (message) => {
     showToast.value = false;
   }, 3000); // Le toast disparaît après 3 secondes
 };
-
-onMounted(fetchQuotes);
 </script>
