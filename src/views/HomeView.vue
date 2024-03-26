@@ -68,7 +68,7 @@ import { selectData } from "../components/SelectData";
 
 const toastMessage = ref("");
 const showToast = ref(false);
-const isLoading = ref(false);
+
 const search = ref("");
 const selectedTheme = ref(null);
 const errorMessage = ref("");
@@ -88,13 +88,6 @@ const handleClick = (item) => {
 };
 
 const generateQuoteFromAPI = async () => {
-  isLoading.value = true; // Commencer le chargement
-  if (!selectedTheme.value) {
-    errorMessage.value =
-      "Veuillez sélectionner un thème pour générer une citation.";
-    isLoading.value = false;
-    return;
-  }
   try {
     const response = await axios.get(
       `https://cita-rapide-backend.vercel.app/v1/quotes/${selectedTheme.value}`
@@ -117,15 +110,11 @@ const generateQuoteFromAPI = async () => {
         errorMessage.value =
           "Impossible de sauvegarder la citation dans la base de données.";
       }
-    } else {
-      errorMessage.value = "Aucune citation trouvée pour ce thème.";
     }
   } catch (error) {
     console.error(error);
     errorMessage.value =
       "Erreur lors de la connexion à l'API externe ou à l'API backend.";
-  } finally {
-    isLoading.value = false; // Fin du chargement
   }
 };
 
