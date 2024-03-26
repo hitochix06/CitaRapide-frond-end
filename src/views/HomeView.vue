@@ -83,7 +83,8 @@ const filteredData = computed(() => {
 });
 
 const handleClick = (item) => {
-  selectedTheme.value = item.theme;
+  selectedTheme.value = item.theme; // Stocker le thème sélectionné
+  search.value = item.theme; // Mettre à jour la barre de recherche avec le nom du thème sélectionné
   errorMessage.value = ""; // Réinitialiser le message d'erreur lorsqu'un thème est sélectionné
 };
 
