@@ -37,7 +37,7 @@
         </div>
         <!-- Le bouton Générer apparaît seulement si un thème est sélectionné -->
         <button
-          v-if="selectedTheme"
+          v-if="selectedTheme && search.trim()"
           @click="handleGenerate"
           class="py-3 px-4 font-bold rounded-md shadow focus:outline-none bg-gradient-to-r from-green-400 to-blue-500 text-white hover:from-green-500 hover:to-blue-600 focus:ring-4 focus:ring-blue-300"
         >
